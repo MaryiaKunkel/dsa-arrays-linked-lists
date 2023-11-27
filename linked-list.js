@@ -25,10 +25,15 @@ class LinkedList {
 
     if (!this.head) {
       this.head = newNode;
-      this.tail = this.head;
+      this.tail = newNode;
+    } else {
+      let current = this.head;
+      while (current.next !== null) {
+        current = current.next;
+      }
+      current.next = newNode;
+      this.tail = newNode;
     }
-    this.tail.next = newNode;
-    this.tail = newNode;
     this.length += 1;
   }
 
@@ -51,22 +56,21 @@ class LinkedList {
     if (!this.head) {
       throw Error("List is empty");
     }
-    const lastItem = this.tail.val;
+    let lastItem;
 
-    if (this.head === this.tail) {
+    if (!this.head.next) {
+      lastItem = this.head.val;
       this.head = null;
       this.tail = null;
-      this.length -= 1;
-      return lastItem;
+    } else {
+      let current = this.head;
+      while (current.next.next != null) {
+        current = current.next;
+      }
+      lastItem = current.next.val;
+      current.next = null;
+      this.tail = current;
     }
-
-    let current = this.head;
-    while (current.next && current.next.next !== null) {
-      current = current.next;
-    }
-
-    this.tail = current;
-    this.tail.next = null;
     this.length -= 1;
     return lastItem;
   }
@@ -118,35 +122,64 @@ class LinkedList {
 
   insertAt(idx, val) {
     const newNode = new Node(val);
+
     if (!this.head) {
       this.head = newNode;
       this.tail = newNode;
-    }
-
-    if (idx >= 0 && idx < this.length) {
+    } else if (idx === 0) {
+      newNode.next = this.head;
+      this.head = newNode;
+    } else if (idx === this.length) {
+      let current = this.head;
+      while (current.next !== null) {
+        current = current.next;
+      }
+      current.next = newNode;
+      this.tail = newNode;
+    } else if (idx > 0 && idx <= this.length) {
       let current = this.head;
       for (let i = 0; i < idx - 1; i++) {
         current = current.next;
       }
-      let after = current.next;
-      newNode.next = after;
+      newNode.next = current.next;
       current.next = newNode;
-      this.length += 1;
     } else {
       throw Error("Invalid index!");
     }
+    this.length += 1;
   }
 
   /** removeAt(idx): return & remove item at idx, */
 
   removeAt(idx) {
-    let current = this.head;
-    for (let i = 0; i < idx; i++) {
-      current = current.next;
+    let removedItem;
+    if (!this.head) {
+      throw Error("List is empty");
+    } else if (idx === 0) {
+      removedItem = this.head;
+      this.head = this.head.next;
+      removedItem.next = null;
+    } else if (idx === this.length - 1) {
+      removedItem = this.tail;
+      let current = this.head;
+      while (current.next !== null) {
+        current = current.next;
+      }
+      current.next = null;
+      this.tail = current;
+    } else if (idx > 0 && idx < this.length - 1) {
+      let current = this.head;
+      for (let i = 0; i < idx - 1; i++) {
+        current = current.next;
+      }
+      removedItem = current.next;
+      current.next = current.next.next;
+      removedItem.next = null;
+    } else {
+      throw Error("Invalid index!");
     }
-    let theItem = current;
-
-    return theItem;
+    this.length -= 1;
+    return removedItem;
   }
 
   /** average(): return an average of all values in the list */
